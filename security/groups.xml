@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+    <record id="partner_credit_admin" model="res.groups"> 
+		<field name="name">Partner credit admin</field>
+	</record>
+
+	
+    </data>
+</openerp>

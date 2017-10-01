@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="customer_credit_limit_view" model="ir.ui.view">
+        <field name="name">customer_credit_limit_view</field>
+        <field name="model">partner.credit.limit</field>
+        <field name="arch" type="xml">
+            <form string="Partner credit limit">
+                <group>
+                    <p>
+                        Favor de validar con el área de finanzas, este cliente se encuentra en situación de crédito con saldo pendiente
+                    </p>
+                </group>
+                <footer>
+                    <button name="action_confirm_anyway" string="Confirm anyway" type="object" class="btn-primary" groups="customer_credit_limit.partner_credit_admin" />
+                    <button string="Cancel" class="btn-default" special="cancel" />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
