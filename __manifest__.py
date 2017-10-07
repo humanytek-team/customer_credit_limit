@@ -16,6 +16,7 @@
     ''',
     'data': [
         'security/groups.xml',
+        'views/sale_view.xml',
         'views/partner_view.xml',
         'views/wizard_view.xml',
     ],

@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016 Serpent Consulting Services Pvt. Ltd.
-# See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
 from datetime import datetime, timedelta, date
@@ -31,6 +29,14 @@ class PartnerCreditLimit(models.TransientModel):
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+    state = fields.Selection([
+        ('draft', 'Quotation'),
+        ('sent', 'Quotation Sent'),
+        ('toconfirm', 'To Confirm'),
+        ('sale', 'Sales Order'),
+        ('done', 'Locked'),
+        ('cancel', 'Cancelled'),
+        ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', default='draft')
 
     @api.multi
     def check_limit(self):
@@ -47,7 +53,7 @@ class SaleOrder(models.Model):
         #print so_ids
 
         for so in so_ids:
-            print 'so.name: ',so.name
+            #print 'so.name: ',so.name
             payment_term = so.payment_term_id or so.partner_id.property_payment_term_id
             days = 0
             print len(payment_term)
@@ -71,12 +77,15 @@ class SaleOrder(models.Model):
                 for inv in so.invoice_ids:
                     if inv.state not in ('open','paid','cancel'):
                         #print 'invoice: ',inv.name
-                        #print 'date_invoice: ',date_invoice
+                        #print 'invoice.id: ',inv.id
+                        #print 'date_invoice: ',inv.date_invoice
                         payment_term = inv.payment_term_id or inv.partner_id.property_payment_term_id
                         days = 0
                         if len(payment_term) > 0:
                             days = payment_term.line_ids and payment_term.line_ids[0] and payment_term.line_ids[0].days
-                        date_invoice = datetime.strptime(inv.date_invoice, "%Y-%m-%d %H:%M:%S")+timedelta(days=days)
+
+                        date_invoice = datetime.strptime(inv.create_date, "%Y-%m-%d %H:%M:%S")+timedelta(days=days)
+                        #date_invoice = datetime.strptime(inv.date_invoice, "%Y-%m-%d %H:%M:%S")+timedelta(days=days)
                         date_invoice = datetime.strftime(date_invoice,"%Y-%m-%d %H:%M:%S")
                         if date_invoice < today_dt:
                             so_amount += inv.amount_total
@@ -125,6 +134,7 @@ class SaleOrder(models.Model):
         """Extend to check credit limit before confirming sale order."""
         for order in self:
             if not order.check_limit():
+                self.state = 'toconfirm'
                 view = self.env.ref('customer_credit_limit.customer_credit_limit_view')
                 wiz = self.env['partner.credit.limit'].create({'so_id': self.id})
                 return {

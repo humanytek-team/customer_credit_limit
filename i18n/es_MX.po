@@ -115,3 +115,8 @@ msgstr ""
 msgid "partner.credit.limit"
 msgstr ""
 
+#. module: sale
+#: selection:sale.order,state:0
+msgid "To Confirm"
+msgstr "Por autorizar"
+
